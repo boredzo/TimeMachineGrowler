@@ -72,7 +72,7 @@
 		units /= 60.0;
 		++unitNameIndex;
 	}
-	return [NSString stringWithFormat:@"%.03f %@", units, unitNames[unitNameIndex]];
+	return [NSString localizedStringWithFormat:@"%.03f %@", units, unitNames[unitNameIndex]];
 }
 
 - (void) pollLogDatabase:(NSTimer *)timer {
