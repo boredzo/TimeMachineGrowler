@@ -85,12 +85,15 @@
 	}
 	aslresponse response = asl_search(NULL, query);
 
+	BOOL lastWasCanceled = NO;
+
 	aslmsg msg;
 	while ((msg = aslresponse_next(response))) {
 		const char *msgUTF8 = asl_get(msg, ASL_KEY_MSG);
 		if (strcmp(msgUTF8, "Starting standard backup") == 0) {
 			[lastStartTime release];
 			lastStartTime = [[self dateFromASLMessage:msg] retain];
+			lastWasCanceled = NO;
 
 			if (postGrowlNotifications) {
 				[GrowlApplicationBridge notifyWithTitle:NSLocalizedString(@"Time Machine started", /*comment*/ @"Notification title")
@@ -105,6 +108,7 @@
 		} else if (strcmp(msgUTF8, "Backup completed successfully.") == 0) {
 			[lastEndTime release];
 			lastEndTime = [[self dateFromASLMessage:msg] retain];
+			lastWasCanceled = NO;
 
 			if (postGrowlNotifications) {
 				[GrowlApplicationBridge notifyWithTitle:NSLocalizedString(@"Time Machine finished", /*comment*/ @"Notification title")
@@ -118,6 +122,7 @@
 
 		} else if (strcmp(msgUTF8, "Backup canceled.") == 0) {
 			NSDate *date = [self dateFromASLMessage:msg];
+			lastWasCanceled = YES;
 
 			if (postGrowlNotifications) {
 				[GrowlApplicationBridge notifyWithTitle:NSLocalizedString(@"Time Machine canceled", /*comment*/ @"Notification title")
@@ -134,7 +139,7 @@
 	asl_free(query);
 
 	//If a Time Machine back-up is running now, post the notification even if we are on our first run.
-	if ((!postGrowlNotifications) && ([lastStartTime compare:lastEndTime] == NSOrderedDescending)) {
+	if ((!postGrowlNotifications) && (!lastWasCanceled) && ([lastStartTime compare:lastEndTime] == NSOrderedDescending)) {
 		[GrowlApplicationBridge notifyWithTitle:NSLocalizedString(@"Time Machine started", /*comment*/ @"Notification title")
 									description:[NSString stringWithFormat:NSLocalizedString(@"%@ since last back-up", @"Notification description format"), [self stringWithTimeInterval:[lastStartTime timeIntervalSinceDate:lastEndTime]]]
 							   notificationName:@"Time Machine started"
