@@ -1,0 +1,8 @@
+//
+// Prefix header for all source files of the 'TimeMachineGrowler' target in the 'TimeMachineGrowler' project
+//
+
+#ifdef __OBJC__
+#	import <Cocoa/Cocoa.h>
+#	import <Growl/Growl.h>
+#endif
