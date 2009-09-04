@@ -11,6 +11,12 @@
 #include <asl.h>
 #define ASL_UNDOC_KEY_TIME_NSEC "TimeNanoSec"
 
+@interface TimeMachineGrowler ()
+
+- (void) pollLogDatabase:(NSTimer *)timer;
+
+@end
+
 @implementation TimeMachineGrowler
 
 - init {
