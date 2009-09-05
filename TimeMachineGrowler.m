@@ -163,7 +163,7 @@
 	asl_free(query);
 
 	//If a Time Machine back-up is running now, post the notification even if we are on our first run.
-	if ((!postGrowlNotifications) && (!lastWasCanceled) && ([lastStartTime compare:lastEndTime] == NSOrderedDescending)) {
+	if ((!postGrowlNotifications) && (!lastWasCanceled) && ((!lastEndTime) || ([lastStartTime compare:lastEndTime] == NSOrderedDescending))) {
 		[self postBackupStartedNotification];
 	}
 
