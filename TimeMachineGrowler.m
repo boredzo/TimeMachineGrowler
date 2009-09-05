@@ -117,12 +117,18 @@
 
 	BOOL lastWasCanceled = NO;
 
+	NSUInteger numFoundMessages = 0UL;
+	NSDate *lastFoundMessageDate = nil;
+
 	aslmsg msg;
 	while ((msg = aslresponse_next(response))) {
+		++numFoundMessages;
+		lastFoundMessageDate = [self dateFromASLMessage:msg];
+
 		const char *msgUTF8 = asl_get(msg, ASL_KEY_MSG);
 		if (strcmp(msgUTF8, "Starting standard backup") == 0) {
 			[lastStartTime release];
-			lastStartTime = [[self dateFromASLMessage:msg] retain];
+			lastStartTime = [lastFoundMessageDate retain];
 			lastWasCanceled = NO;
 
 			if (postGrowlNotifications) {
@@ -131,7 +137,7 @@
 
 		} else if (strcmp(msgUTF8, "Backup completed successfully.") == 0) {
 			[lastEndTime release];
-			lastEndTime = [[self dateFromASLMessage:msg] retain];
+			lastEndTime = [lastFoundMessageDate retain];
 			lastWasCanceled = NO;
 
 			if (postGrowlNotifications) {
@@ -145,7 +151,7 @@
 			}
 
 		} else if (strcmp(msgUTF8, "Backup canceled.") == 0) {
-			NSDate *date = [self dateFromASLMessage:msg];
+			NSDate *date = lastFoundMessageDate;
 			lastWasCanceled = YES;
 
 			if (postGrowlNotifications) {
@@ -167,8 +173,10 @@
 		[self postBackupStartedNotification];
 	}
 
-	[lastSearchTime release];
-	lastSearchTime = [[NSDate date] retain];
+	if (numFoundMessages > 0) {
+		[lastSearchTime release];
+		lastSearchTime = [lastFoundMessageDate retain];
+	}
 	postGrowlNotifications = YES;
 }
 
