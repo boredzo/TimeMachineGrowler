@@ -93,6 +93,17 @@
 	return [NSString localizedStringWithFormat:@"%.03f %@", units, unitNames[unitNameIndex]];
 }
 
+- (void) postBackupStartedNotification {
+	//This method is as re-entrant as an emergency exit door.
+	[GrowlApplicationBridge notifyWithTitle:NSLocalizedString(@"Time Machine started", /*comment*/ @"Notification title")
+								description:lastEndTime ? [NSString stringWithFormat:NSLocalizedString(@"%@ since last back-up", @"Notification description format"), [self stringWithTimeInterval:[lastStartTime timeIntervalSinceDate:lastEndTime]]] : NSLocalizedString(@"Either this will be your first back-up, or your previous one was so long ago that it is no longer in the system log.", /*comment*/ @"Notification description format")
+						   notificationName:@"Time Machine started"
+								   iconData:timeMachineIconData
+								   priority:-1
+								   isSticky:NO
+							   clickContext:nil];
+}
+
 - (void) pollLogDatabase:(NSTimer *)timer {
 	aslmsg query = asl_new(ASL_TYPE_QUERY);
 	const char *backupd_sender = [self isOnSnowLeopardOrLater] ? "com.apple.backupd" : "/System/Library/CoreServices/backupd";
@@ -115,13 +126,7 @@
 			lastWasCanceled = NO;
 
 			if (postGrowlNotifications) {
-				[GrowlApplicationBridge notifyWithTitle:NSLocalizedString(@"Time Machine started", /*comment*/ @"Notification title")
-											description:[NSString stringWithFormat:NSLocalizedString(@"%@ since last back-up", @"Notification description format"), [self stringWithTimeInterval:[lastStartTime timeIntervalSinceDate:lastEndTime]]]
-									   notificationName:@"Time Machine started"
-											   iconData:timeMachineIconData
-											   priority:-1
-											   isSticky:NO
-										   clickContext:nil];
+				[self postBackupStartedNotification];
 			}
 
 		} else if (strcmp(msgUTF8, "Backup completed successfully.") == 0) {
@@ -159,13 +164,7 @@
 
 	//If a Time Machine back-up is running now, post the notification even if we are on our first run.
 	if ((!postGrowlNotifications) && (!lastWasCanceled) && ([lastStartTime compare:lastEndTime] == NSOrderedDescending)) {
-		[GrowlApplicationBridge notifyWithTitle:NSLocalizedString(@"Time Machine started", /*comment*/ @"Notification title")
-									description:[NSString stringWithFormat:NSLocalizedString(@"%@ since last back-up", @"Notification description format"), [self stringWithTimeInterval:[lastStartTime timeIntervalSinceDate:lastEndTime]]]
-							   notificationName:@"Time Machine started"
-									   iconData:timeMachineIconData
-									   priority:-1
-									   isSticky:NO
-								   clickContext:nil];
+		[self postBackupStartedNotification];
 	}
 
 	[lastSearchTime release];
