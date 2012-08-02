@@ -18,7 +18,6 @@
 }
 - (void) applicationWillTerminate:(NSNotification *)notification {
 	[growler stopMonitoringTheLogs];
-	[growler release];
 }
 
 @end

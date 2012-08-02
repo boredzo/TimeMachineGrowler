@@ -24,7 +24,7 @@
 		[GrowlApplicationBridge setGrowlDelegate:self];
 
 		NSWorkspace *wksp = [NSWorkspace sharedWorkspace];
-		timeMachineIconData = [[[wksp iconForFile:[wksp absolutePathForAppBundleWithIdentifier:@"com.apple.backup.launcher"]] TIFFRepresentation] retain];
+		timeMachineIconData = [[wksp iconForFile:[wksp absolutePathForAppBundleWithIdentifier:@"com.apple.backup.launcher"]] TIFFRepresentation];
 	}
 	return self;
 }
@@ -33,24 +33,19 @@
 		[self stopMonitoringTheLogs];
 
 	[GrowlApplicationBridge setGrowlDelegate:nil];
-	[lastSearchTime release];
-	[lastStartTime release];
-	[lastEndTime release];
-	[timeMachineIconData release];
-	[super dealloc];
 }
 
 - (void) startMonitoringTheLogs {
-	pollTimer = [[NSTimer scheduledTimerWithTimeInterval:10.0
+	pollTimer = [NSTimer scheduledTimerWithTimeInterval:10.0
 												  target:self
 												selector:@selector(pollLogDatabase:)
 												userInfo:nil
-												 repeats:YES] retain];
+												 repeats:YES];
 	[pollTimer fire];
 }
 - (void) stopMonitoringTheLogs {
 	[pollTimer invalidate];
-	[pollTimer release];
+	pollTimer = nil;
 }
 
 - (BOOL) isOnSnowLeopardOrLater {
@@ -127,8 +122,7 @@
 
 		const char *msgUTF8 = asl_get(msg, ASL_KEY_MSG);
 		if (strcmp(msgUTF8, "Starting standard backup") == 0) {
-			[lastStartTime release];
-			lastStartTime = [lastFoundMessageDate retain];
+			lastStartTime = lastFoundMessageDate;
 			lastWasCanceled = NO;
 
 			if (postGrowlNotifications) {
@@ -136,8 +130,7 @@
 			}
 
 		} else if (strcmp(msgUTF8, "Backup completed successfully.") == 0) {
-			[lastEndTime release];
-			lastEndTime = [lastFoundMessageDate retain];
+			lastEndTime = lastFoundMessageDate;
 			lastWasCanceled = NO;
 
 			if (postGrowlNotifications) {
@@ -174,8 +167,7 @@
 	}
 
 	if (numFoundMessages > 0) {
-		[lastSearchTime release];
-		lastSearchTime = [lastFoundMessageDate retain];
+		lastSearchTime = lastFoundMessageDate;
 	}
 	postGrowlNotifications = YES;
 }
