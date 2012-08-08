@@ -28,6 +28,8 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>10.7.0</string>
 	<key>NSSupportsSuddenTermination</key>
 	<true/>
 </dict>

@@ -48,18 +48,6 @@
 	pollTimer = nil;
 }
 
-- (BOOL) isOnSnowLeopardOrLater {
-	OSStatus err;
-	SInt32 majorVersion, minorVersion;
-
-	err = Gestalt(gestaltSystemVersionMajor, &majorVersion);
-	NSAssert2(err == noErr, @"Couldn't get major system version: %i/%s", (int)err, GetMacOSStatusCommentString(err));
-	err = Gestalt(gestaltSystemVersionMinor, &minorVersion);
-	NSAssert2(err == noErr, @"Couldn't get minor system version: %i/%s", (int)err, GetMacOSStatusCommentString(err));
-
-	return (majorVersion > 10) || ((majorVersion == 10) && (minorVersion >= 6));
-}
-
 - (NSDate *) dateFromASLMessage:(aslmsg)msg {
 	NSTimeInterval unixTime = strtod(asl_get(msg, ASL_KEY_TIME), NULL);
 	const char *nanosecondsUTF8 = asl_get(msg, ASL_UNDOC_KEY_TIME_NSEC);
@@ -101,7 +89,7 @@
 
 - (void) pollLogDatabase:(NSTimer *)timer {
 	aslmsg query = asl_new(ASL_TYPE_QUERY);
-	const char *backupd_sender = [self isOnSnowLeopardOrLater] ? "com.apple.backupd" : "/System/Library/CoreServices/backupd";
+	const char *backupd_sender = "com.apple.backupd";
 	asl_set_query(query, ASL_KEY_SENDER, backupd_sender, ASL_QUERY_OP_EQUAL);
 	if (lastSearchTime) {
 		char *lastSearchTimeUTF8 = NULL;

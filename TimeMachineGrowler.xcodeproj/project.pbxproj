@@ -264,6 +264,7 @@
 				GCC_WARN_UNUSED_VALUE = YES;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				PRODUCT_NAME = TimeMachineGrowler;
 				RUN_CLANG_STATIC_ANALYZER = YES;
 			};
@@ -296,6 +297,7 @@
 				GCC_WARN_UNUSED_VALUE = YES;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				PRODUCT_NAME = TimeMachineGrowler;
 				RUN_CLANG_STATIC_ANALYZER = YES;
 			};
