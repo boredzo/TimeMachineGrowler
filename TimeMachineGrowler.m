@@ -109,7 +109,7 @@
 		lastFoundMessageDate = [self dateFromASLMessage:msg];
 
 		const char *msgUTF8 = asl_get(msg, ASL_KEY_MSG);
-		if (strcmp(msgUTF8, "Starting standard backup") == 0) {
+		if (strcmp(msgUTF8, "Starting automatic backup") == 0 || strcmp(msgUTF8, "Starting manual backup") == 0) {
 			lastStartTime = lastFoundMessageDate;
 			lastWasCanceled = NO;
 
